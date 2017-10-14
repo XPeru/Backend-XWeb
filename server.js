@@ -15,7 +15,7 @@ const connectMysql = require("./connectMysql.js");
 dotenv.config({ path: ".env.dev" });
 
 var app = express();
-app.use(favicon(path.join(__dirname, '/dev/media/favicon.ico')));
+app.use(favicon(path.join(__dirname, '../XWebApp/dev/media/favicon.ico')));
 app.use(compression());
 app.use(errorHandler());
 app.use(bodyParser.urlencoded({ limit: "150mb", extended: true }));
@@ -25,7 +25,7 @@ app.use('/api', router);
 // express.static gaves access to a directory from the browser client
 // the __dirname directory becames "public"
 // __dirname is the current directory
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, '../XWebApp')));
 
 const loadModule = function () {
 	return function (file) {
