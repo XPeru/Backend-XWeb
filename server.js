@@ -9,6 +9,7 @@ const fileSystem = require("graceful-fs");
 const dotenv = require("dotenv");
 const compression = require("compression");
 const errorHandler = require("errorHandler");
+const _ = require("underscore");
 
 const connectMysql = require("./connectMysql.js");
 
@@ -66,6 +67,9 @@ app.use(function (req, res, next) {
     sanitizeInput(req.query);
     next();
 });
+
+//making underscorejs available for all modules
+global._ = _;
 
 app.listen(process.env.PORT, function () {
     console.log(colors.green("All right ! I am alive at Port " + process.env.PORT));

@@ -22,7 +22,8 @@
     "pdfkit": "^0.7.2",
     "promise-mysql": "^3.1.0",
     "serve-favicon": "^2.3.0",
-    "serve-static": "^1.11.1"
+    "serve-static": "^1.11.1",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "grunt": "^1.0.0",
