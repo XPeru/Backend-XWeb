@@ -1,5 +1,7 @@
-var mysql = require('promise-mysql');
+var mysql = require("promise-mysql");
 const dotenv = require("dotenv");
+const _ = require("underscore");
+const sqlTools = require("./sql.js");
 dotenv.config({ path: "../.env.dev" });
 
 exports.connection = function () {
@@ -8,12 +10,7 @@ exports.connection = function () {
         user     : process.env.MYSQL_USER,
         password : process.env.MYSQL_PASSWORD
     });
-    connection.connect(function(err) {
-        if (err) {
-            console.error('error connecting: ' + err.stack);
-        return;
-        }
-        console.log('connected as id ' + connection.threadId);
-    });
+    global._ = _;
+    global.sqlTools = sqlTools;
     return connection;
 };
