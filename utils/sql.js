@@ -83,7 +83,7 @@ exports.insertIntoQuery = (table_name, objs) => {
     }, "");
     end_query = end_query.slice(0, -1);
     end_query = "(".concat(end_query).concat("),");
-    var values = [];
+    const values = [];
     _.each(objs, (obj) => {
         query = query.concat(end_query);
         _.each(keys, (key) => {
@@ -92,4 +92,28 @@ exports.insertIntoQuery = (table_name, objs) => {
     });
     query = query.slice(0, -1);
     return mysql.format(query, values);
+};
+
+exports.createDatabaseQuery = (name) => {
+    const query = 'CREATE DATABASE IF NOT EXISTS ' + name;
+    return mysql.format(query);
+};
+
+exports.alterTableQuery = (data) => {
+    const query = 'ALTER TABLE '.concat(data.table_name).concat(' ')
+        .concat('CHANGE COLUMN ')
+        .concat(data.old_column_name).concat(' ')
+        .concat(data.new_column.name).concat(' ')
+        .concat(data.new_column.type).concat(' ')
+        .concat(data.new_column.notNull ? ' NOT NULL' : ' NULL');
+    console.log(query);
+    return query;
+};
+
+// sw means script wrapper
+exports.sw = (func) => {
+    func().then((val) => {
+    }).catch((err) => {
+        console.log(err);
+    });
 };
