@@ -23,7 +23,8 @@ app.use(bodyParser.urlencoded({ limit: "150mb", extended: true }));
 app.use(bodyParser.json({ limit: "150mb" }));
 var router = express.Router();
 app.use('/api', router);
-
+// only for angularjs app -> to be deleted in the near future
+app.use(express.static(path.join(__dirname, '../XWebApp')));
 const loadModule = function () {
 	return function (file) {
 		// avoiding IDE's files
