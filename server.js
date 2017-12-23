@@ -23,10 +23,6 @@ app.use(bodyParser.urlencoded({ limit: "150mb", extended: true }));
 app.use(bodyParser.json({ limit: "150mb" }));
 var router = express.Router();
 app.use('/api', router);
-// express.static gaves access to a directory from the browser client
-// the __dirname directory becames "public"
-// __dirname is the current directory
-app.use(express.static(path.join(__dirname, '../XWebApp')));
 
 const loadModule = function () {
 	return function (file) {
