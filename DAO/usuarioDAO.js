@@ -1,4 +1,4 @@
-/* global mySqlPool, mysql */
+
 var multer  =   require('multer');
 var dateGenerator = require("./dateGenerator.js");
 var dateGeneratorO = new dateGenerator("usuarioDAO");
@@ -13,26 +13,25 @@ var router = require("express").Router();
 
 dateGeneratorO.printStart();
 var storage = multer.diskStorage({
-
-  destination: function (req, file, callback) {
-	callback(null, pathUpload);
-  },
-  filename: function (req, file, callback) {
-	finalNameFile = file.fieldname + '-' + Date.now();
-	completePathFile = pathUpload + finalNameFile;
-	callback(null, finalNameFile);
-  }
+    destination: (req, file, cb) => {
+        cb(null, pathUpload);
+    },
+    filename: (req, file, cb) => {
+        finalNameFile = file.fieldname + '-' + Date.now();
+        completePathFile = pathUpload + finalNameFile;
+        cb(null, finalNameFile);
+    }
 });
 var upload = multer({ storage : storage}).single(nameBase);
 
-router.get("/list", cf( async(req) => {
+router.get("/list", cf(async(req) => {
 	dateGeneratorO.printSelect("list");
 	var query = "SELECT " + "\n" +
 				"	us.ID_USUARIO, " + "\n" +
 				"	us.NOMBRE, " + "\n" +
 				"	us.APELLIDOS, " + "\n" +
 				"	us.EMAIL, " + "\n" +
-				"	us.FOTO, " + "\n" +
+				"	us.IMAGEN, " + "\n" +
 				"	us.FK_TIPO_USUARIO, " + "\n" +
 				"	us.CREATE_TIME, " + "\n" +
 				"	us.UPDATE_TIME, " + "\n" +
@@ -49,12 +48,9 @@ router.get("/list", cf( async(req) => {
 	query = mysql.format(query, table);
 	dateGeneratorO.printSelect(query);
 	var connection = await mySqlPool.getConnection();
-	var rows = await connection.query(query);
-	var result = {
-		Usuarios: rows
-	};
+	const rows = await connection.query(query);
 	connection.release();
-	return result;
+	return rows;
 }));
 
 router.post("/", cf( async(req) => {
