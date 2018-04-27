@@ -4,25 +4,7 @@ var dateGenerator = require("./dateGenerator.js");
 var dateGeneratorO = new dateGenerator("usuarioDAO");
 // For hash encryption, used for passwords
 const md5 = require('MD5');
-//this path has to exist before running the server
-var pathUpload = "./dev/media/usuarios/";
-var finalNameFile;
-var completePathFile;
-var nameBase = "userPhoto";
 var router = require("express").Router();
-
-dateGeneratorO.printStart();
-var storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, pathUpload);
-    },
-    filename: (req, file, cb) => {
-        finalNameFile = file.fieldname + '-' + Date.now();
-        completePathFile = pathUpload + finalNameFile;
-        cb(null, finalNameFile);
-    }
-});
-var upload = multer({ storage : storage}).single(nameBase);
 
 router.get("/list", cf(async(req) => {
 	dateGeneratorO.printSelect("list");
@@ -62,7 +44,7 @@ router.post("/", cf( async(req) => {
 				"		EMAIL," + "\n" +
 				"		PASSWORD," + "\n" +
 				"		FK_TIPO_USUARIO," + "\n" +
-				"		FOTO" + "\n" +
+				"		IMAGEN" + "\n" +
 				"	) VALUES (" + "\n" +
 				"		?," + "\n" +
 				"		?," + "\n" +
@@ -174,16 +156,41 @@ router.put("/delete", cf( async(req) => {
 	return result;
 }));
 
-router.post("/photo", function (req, res) {
-	dateGeneratorO.printInsert("photo");
-	dateGeneratorO.printInsert(req);
-	upload(req, res, function (error) {
-		if (error) {
-			dateGeneratorO.printError(req, error.message);
-			return res.end("Error uploading file.");
-		}
-		res.end(completePathFile);
-	});
-});
+const uploadAsync = async (req, res, data) => {
+    let completePath;
+    const storage = multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, data.path);
+        },
+        filename: (req, file, cb) => {
+            const name = file.fieldname + data.end_name;
+            completePath = data.path + name;
+            cb(null, name);
+        }
+    });
+    const upload = multer({ storage: storage }).single(data.base_name);
+
+    return new Promise((resolve, reject) => {
+        upload(req, res, (error) => {
+            if (error) {
+                reject(error);
+                return res.end(error);
+            } else {
+                resolve(completePath);
+            }
+        });
+    });
+};
+
+router.post("/photo", cf(async (req, res) => {
+  const data = {
+    //this path has to exist before running the server
+    path: "./media/usuarios/",
+    end_name: '-' + Date.now(),
+    base_name: "userPhoto"
+  };
+  const completePath = await uploadAsync(req, res, data);
+  return completePath;
+}));
 
 exports.router = router;
