@@ -37,29 +37,14 @@ router.get("/list", cf(async(req) => {
 
 router.post("/", cf( async(req) => {
 	dateGeneratorO.printInsert("/");
-	var query = "INSERT INTO " + "\n" +
-				"	USUARIO (" + "\n" +
-				"		NOMBRE," + "\n" +
-				"		APELLIDOS," + "\n" +
-				"		EMAIL," + "\n" +
-				"		PASSWORD," + "\n" +
-				"		FK_TIPO_USUARIO," + "\n" +
-				"		IMAGEN" + "\n" +
-				"	) VALUES (" + "\n" +
-				"		?," + "\n" +
-				"		?," + "\n" +
-				"		?," + "\n" +
-				"		?," + "\n" +
-				"		?," + "\n" +
-				"		?" + "\n" +
-				"	)";
-	var table = [req.body.NOMBRE,
-				req.body.APELLIDOS,
-				req.body.EMAIL,
-				md5(req.body.PASSWORD),
-				req.body.FK_TIPO_USUARIO,
-				req.body.FOTO];
-	query = mysql.format(query, table);
+	const usuario = {
+			nombre: req.body.NOMBRE,
+			apellidos: req.body.APELLIDOS,
+			password: md5(req.body.PASSWORD),
+			fk_tipo_usuario: req.body.FK_TIPO_USUARIO,
+			imagen: req.body.FOTO
+	};
+	const query = sqlTools.insertIntoQuery('usuario', [usuario]);
 	dateGeneratorO.printInsert(query);
 	var connection = await mySqlPool.getConnection();
 	await connection.query(query);

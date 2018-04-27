@@ -12,6 +12,7 @@ const errorHandler = require("errorHandler");
 const _ = require("underscore");
 
 const connectMysql = require("./connectMysql.js");
+const sqlTools = require("./utils/sql.js");
 
 dotenv.config({ path: ".env.dev" });
 
@@ -67,7 +68,7 @@ app.use(function (req, res, next) {
 
 //making underscorejs available for all modules
 global._ = _;
-
+global.sqlTools = sqlTools;
 app.listen(process.env.PORT, function () {
     console.log(colors.green("All right ! I am alive at Port " + process.env.PORT));
 });
