@@ -1,100 +1,81 @@
-/* global mySqlPool, mysql */
-var dateGenerator = require("./dateGenerator.js");
-var dateGeneratorO = new dateGenerator("tipousuarioDAO");
-var fs = require('fs');
+const dateGenerator = require("./dateGenerator.js");
+const dateGeneratorO = new dateGenerator("tipousuarioDAO");
+const fs = require('fs');
 
-var PDFDocument = require('pdfkit');
-var router = require("express").Router();
+const PDFDocument = require('pdfkit');
+const router = require("express").Router();
 
-dateGeneratorO.printStart();
+// this should prevent SQL injection
+const getArguments = (req) => {
+	const queryParams = req.query;
+    const filter = queryParams.filter || '';
+    const sortOrder = queryParams.sortOrder;
+    const pageNumber = parseInt(queryParams.pageNumber) || 0;
+    const pageSize = parseInt(queryParams.pageSize);
+	const orderBy = queryParams.active || 'ID_TIPO_USUARIO';
+	return { filter, sortOrder, pageNumber, pageSize, orderBy };
+};
 
-router.get("/list", cf( async(req) => {
-	dateGeneratorO.printSelect("list");
-	var query = "CALL SP_SEARCH_ALL('TIPO_USUARIO')";
-	var table = [];
-	query = mysql.format(query, table);
+const getTiposUsuarioAsync = async (req) => {
+	const query = "CALL SP_SEARCH_ALL('TIPO_USUARIO')";
 	dateGeneratorO.printSelect(query);
-	var connection = await mySqlPool.getConnection();
-	var rows = await connection.query(query);
-	var result = {
-		TiposUsuario: rows[0]
-	};
+	const connection = await mySqlPool.getConnection();
+	const rows = await connection.query(query);
 	connection.release();
-	return result;
-}));
+	return rows[0];
+};
 
-router.post("/", cf( async(req) => {
-	dateGeneratorO.printInsert("/");
-	var query = "INSERT INTO " + "\n" +
-	            "   TIPO_USUARIO(" + "\n" +
-	            "       TIPO" + "\n" +
-	            "   ) VALUES (" + "\n" +
-	            "       ?" + "\n" +
-	            "   )";
-	var table = [req.body.TIPO];
-	query = mysql.format(query, table);
+const createTipoUsuarioAsync = async (req) => {
+	const tipoUsuario = {
+		tipo: req.body.TIPO
+	}
+	const query = sqlTools.insertIntoQuery('tipo_usuario',[tipoUsuario]);
 	dateGeneratorO.printInsert(query);
-	var connection = await mySqlPool.getConnection();
+	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
-	var result = {
-		Message: "OK"
-	};
 	connection.release();
-	return result;
-}));
+	return "OK";
+};
 
-router.put("/", cf( async(req) => {
-	dateGeneratorO.printUpdate("/");
-	var query = "UPDATE " + "\n" +
+const updateTipoUsuarioAsync = async (req) => {
+	let query = "UPDATE " + "\n" +
 	            "   TIPO_USUARIO " + "\n" +
 	            "SET " + "\n" +
 	            "   TIPO = ? " + "\n" +
 	            "WHERE " + "\n" +
 	            "   ID_TIPO_USUARIO = ?";
-	var table = [req.body.TIPO, req.body.ID_TIPO_USUARIO];
+	const table = [req.body.TIPO,
+				req.body.ID_TIPO_USUARIO];
 	query = mysql.format(query, table);
 	dateGeneratorO.printUpdate(query);
 	var connection = await mySqlPool.getConnection();
 	await connection.query(query);
-	var result = {
-		Message: "OK"
-	};
 	connection.release();
-	return result;
-}));
+	return "OK";
+};
 
-router.get("/:id_tipo_usuario", cf( async(req) => {
-	dateGeneratorO.printSelect("/:id_tipo_usuario");
-	var query = "CALL SP_SEARCH('TIPO_USUARIO','ID_TIPO_USUARIO',?)";
-	var table = [req.params.id_tipo_usuario];
-	query = mysql.format(query, table);
+const getTipoUsuarioByIdAsync = async (req) => {
+	let query = "CALL SP_SEARCH('TIPO_USUARIO','ID_TIPO_USUARIO',?)";
+	query = mysql.format(query, [req.params.id_tipo_usuario]);
 	dateGeneratorO.printSelect(query);
-	var connection = await mySqlPool.getConnection();
-	var rows = await connection.query(query);
-	var result = {
-		TipoUsuario: rows[0]
-	};
+	const connection = await mySqlPool.getConnection();
+	const rows = await connection.query(query);
 	connection.release();
-	return result;
-}));
+	return rows[0];
+};
 
-router.delete("/:id_tipo_usuario", cf( async(req) => {
-	dateGeneratorO.printDelete("/:id_tipo_usuario");
-	var query = "DELETE FROM " + "\n" +
+const deleteTipoUsuarioById = async (req) => {
+	let query = "DELETE FROM " + "\n" +
 	            "   TIPO_USUARIO " + "\n" +
 	            "WHERE " + "\n" +
 	            "   ID_TIPO_USUARIO=?";
-	var table = [req.params.id_tipo_usuario];
-	query = mysql.format(query, table);
+	query = mysql.format(query, [req.params.id_tipo_usuario]);
 	dateGeneratorO.printDelete(query);
 	var connection = await mySqlPool.getConnection();
 	await connection.query(query);
-	var result = {
-		Message: "OK"
-	};
 	connection.release();
-	return result;
-}));
+	return "OK";
+};
 
 router.get("/topdf", cf( async(req) => {
 
@@ -133,5 +114,11 @@ router.get("/topdf", cf( async(req) => {
     res.json ({"dataR" : 'output.pdf'});
 
 }));
+
+router.get('/get', cf(getTiposUsuarioAsync));
+router.get('/get/:id', cf(getTipoUsuarioByIdAsync));
+router.post('/create', cf(createTipoUsuarioAsync));
+router.put('/update', cf(updateTipoUsuarioAsync));
+router.delete('/delete/:id', cf(deleteTipoUsuarioById));
 
 exports.router = router;
