@@ -44,11 +44,11 @@ const updateTipoUsuarioAsync = async (req) => {
 	            "   TIPO = ? " + "\n" +
 	            "WHERE " + "\n" +
 	            "   ID_TIPO_USUARIO = ?";
-	const table = [req.body.TIPO,
-				req.body.ID_TIPO_USUARIO];
+	const table = [	req.body.TIPO,
+									req.body.ID_TIPO_USUARIO];
 	query = mysql.format(query, table);
 	dateGeneratorO.printUpdate(query);
-	var connection = await mySqlPool.getConnection();
+	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	connection.release();
 	return "OK";
@@ -71,7 +71,7 @@ const deleteTipoUsuarioById = async (req) => {
 	            "   ID_TIPO_USUARIO=?";
 	query = mysql.format(query, [req.params.id_tipo_usuario]);
 	dateGeneratorO.printDelete(query);
-	var connection = await mySqlPool.getConnection();
+	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	connection.release();
 	return "OK";
