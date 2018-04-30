@@ -1,13 +1,9 @@
-/* global mySqlPool, mysql */
-var dateGenerator = require("./dateGenerator.js");
-var dateGeneratorO = new dateGenerator("asoctipoaccesoDAO");
-var router = require("express").Router();
+const dateGenerator = require("./dateGenerator.js");
+const dateGeneratorO = new dateGenerator("asoctipoaccesoDAO");
+const router = require("express").Router();
 
-dateGeneratorO.printStart();
-
-router.get("/:id_tipo_usuario", cf( async(req) => {
-	dateGeneratorO.printSelect("/:id_tipo_usuario");
-	var query = "SELECT " + "\n" +
+const getAsocTipoAccesoAsync = async (req) {
+	let query = "SELECT " + "\n" +
 				"	acc.ID_ACCESO_USUARIO, " + "\n" +
 				"	acc.DESCRIPCION" + "\n" +
 				"FROM " + "\n" +
@@ -16,60 +12,51 @@ router.get("/:id_tipo_usuario", cf( async(req) => {
 				"	acc.ID_ACCESO_USUARIO = asso.FK_ACCESO_USUARIO" + "\n" +
 				"WHERE" + "\n" +
 				"	asso.FK_TIPO_USUARIO = ?";
-	var table = [req.params.id_tipo_usuario];
-	query = mysql.format(query, table);
+	query = mysql.format(query, [req.params.id_tipo_usuario]);
 	dateGeneratorO.printSelect(query);
-	var connection = await mySqlPool.getConnection();
-	var rows = await connection.query(query);
-	var result = {
-		Assos: rows
-	};
+	const connection = await mySqlPool.getConnection();
+	const rows = await connection.query(query);
 	connection.release();
-	return result;
-}));
+	return rows;
+};
 
-router.post("/", cf( async(req) => {
-	dateGeneratorO.printInsert("/");
-	var query = "INSERT INTO " + "\n" +
+const createAsocTipoAccesoAsync = async (req) => {
+	let query = "INSERT INTO " + "\n" +
 				"	ASOC_TIPO_ACCESO (" + "\n" +
 				"		FK_TIPO_USUARIO, " + "\n" +
 				"		FK_ACCESO_USUARIO, " + "\n" +
 				"		IS_ACTIVE" + "\n" +
 				"	) VALUES";
-	var idTipoUsuario = req.body.ID_TIPO_USUARIO;
-	var end_query = "\n" + " (?, ?, ?)";
-	var table = req.body.LIST.reduce(function (tabla, record) {
+	const idTipoUsuario = req.body.ID_TIPO_USUARIO;
+	const end_query = "\n" + " (?, ?, ?)";
+	const table = req.body.LIST.reduce(function (tabla, record) {
 										query = query + end_query + ",";
 										tabla.push(idTipoUsuario, record.ID_ACCESO_USUARIO, 1);
 										return tabla;
 									}, []);
 	query = mysql.format(query.slice(0, -1), table);
 	dateGeneratorO.printInsert(query);
-	var connection = await mySqlPool.getConnection();
+	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
-	var result = {
-			Message: "OK"
-	};
 	connection.release();
-	return result;
-}));
+	return "OK";
+};
 
-router.delete( "/:id_tipo_usuario", cf( async(req) => {
-	dateGeneratorO.printDelete("/:id_tipo_usuario");
-	var query = "DELETE FROM" + "\n" +
+const deleteAsocTipoAccesoAsync = async (req) => {
+	let query = "DELETE FROM" + "\n" +
 				"	ASOC_TIPO_ACCESO" + "\n" +
 				"WHERE " + "\n" +
 				"	FK_TIPO_USUARIO = ?";
-	var table = [req.params.id_tipo_usuario];
-	query = mysql.format(query, table);
+	query = mysql.format(query, [req.params.id_tipo_usuario]);
 	dateGeneratorO.printDelete(query);
-	var connection = await mySqlPool.getConnection();
+	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
-	var result = {
-			Message: "OK"
-	};
 	connection.release();
-	return result;
-}));
+	return "OK";
+};
+
+router.get('/get', cf(getAsocTipoAccesoAsync));
+router.post('/create', cf(createAsocTipoAccesoAsync));
+router.delete('/delete/:id', cf(deleteAsocTipoAccesoAsync));
 
 exports.router = router;
