@@ -101,20 +101,38 @@ exports.insertIntoQuery = (table_name, objs) => {
 };
 
 exports.createDatabaseQuery = (name) => {
-    const res = mysql.format('CREATE DATABASE IF NOT EXISTS ??', name);
-    debugLogger.log(res);
-    return res;
+	const res = mysql.format('CREATE DATABASE IF NOT EXISTS ?? CHARACTER SET utf8 COLLATE utf8_general_ci;', name);
+	debugLogger.log(res);
+	return res;
+};
+
+exports.dropDatabaseQuery = (name) => {
+	const res = mysql.format('DROP DATABASE IF EXISTS ??', name);
+	debugLogger.log(res);
+	return res;
 };
 
 exports.alterTableQuery = (data) => {
-    const query = 'ALTER TABLE '.concat(data.table_name).concat(' ')
-        .concat('CHANGE COLUMN ')
-        .concat(data.old_column_name).concat(' ')
-        .concat(data.new_column.name).concat(' ')
-        .concat(data.new_column.type).concat(' ')
-        .concat(data.new_column.notNull ? ' NOT NULL' : ' NULL');
-    debugLogger.log(query);
-    return query;
+	const text = data.new_column.notNull ? ' NOT NULL' : ' NULL';
+	const query = `ALTER TABLE ${data.table_name} CHANGE COLUMN ${data.old_column_name} ${data.new_column.name} ${data.new_column.type}` + text;
+	debugLogger.log(query);
+	return query;
+};
+
+exports.updateQuery = (table_name, obj, keys) => {
+	const idName = `id_${table_name}`;
+	const where = `${obj[idName]} = ${idName}`;
+	const keyValueList = [];
+	_.each(obj, (value, key) => {
+		if (_.contains(keys, key)) {
+			keyValueList.push(key);
+			keyValueList.push(value);
+		}
+	});
+	const t = `${new Array(keyValueList.length / 2).fill('?? = ?').join(',')}`;
+	const query = `UPDATE ?? SET ${t} WHERE ${where}`;
+
+	return mysql.format(query, [table_name].concat(keyValueList));
 };
 
 
