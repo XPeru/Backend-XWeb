@@ -15,7 +15,7 @@ const createUsuarioAsync = async (req) => {
 		fk_tipo_usuario: req.body.FK_TIPO_USUARIO,
 		imagen: req.body.FOTO
 	};
-	const query = sqlTools.insertIntoQuery('usuario', [usuario]);
+	const query = sqlTools.insertIntoQuery('USUARIO', [usuario]);
 	dateGeneratorO.printInsert(query);
 	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
@@ -28,40 +28,41 @@ const getArguments = (req) => {
 	const queryParams = req.query;
 	const filter = queryParams.filter || '';
 	const sortOrder = queryParams.sortOrder;
-	const pageNumber = parseInt(queryParams.pageNumber, 10) || 0;
-	const pageSize = parseInt(queryParams.pageSize, 10);
+	const pageSize = parseInt(queryParams.pageSize, 10) || 0;
+	const initialPos = (parseInt(queryParams.pageNumber, 10) || 0) * pageSize;
 	const orderBy = queryParams.active || 'ID_USUARIO';
-	return { filter, sortOrder, pageNumber, pageSize, orderBy };
+	return { filter, sortOrder, initialPos, pageSize, orderBy };
 };
 
 const getUsuariosAsync = async (req) => {
 	const connection = await mySqlPool.getConnection();
-	const { filter, sortOrder, pageNumber, pageSize, orderBy } = getArguments(req);
-
-	const query = 'SELECT ' + '\n' +
-				'	us.ID_USUARIO, ' + '\n' +
-				'	us.NOMBRE, ' + '\n' +
-				'	us.APELLIDOS, ' + '\n' +
-				'	us.EMAIL, ' + '\n' +
-				'	us.IMAGEN, ' + '\n' +
-				'	us.FK_TIPO_USUARIO, ' + '\n' +
-				'	us.CREATE_TIME, ' + '\n' +
-				'	us.UPDATE_TIME, ' + '\n' +
-				'	us.IS_ACTIVE, ' + '\n' +
-				'	tipo.TIPO' + '\n' +
-				'FROM' + '\n' +
-				'	USUARIO us' + '\n' +
-				'INNER JOIN' + '\n' +
-				'	TIPO_USUARIO tipo ON' + '\n' +
-				'		tipo.ID_TIPO_USUARIO = us.FK_TIPO_USUARIO' + '\n' +
-				(filter ? " WHERE us.NOMBRE LIKE '%" + filter + "%'" : '') + '\n' +
-				' ORDER BY ' + orderBy + ' ' + sortOrder;
+	const { filter, sortOrder, initialPos, pageSize, orderBy } = getArguments(req);
+	const query = 'SELECT * FROM ' +
+					'(SELECT ' +
+					'	us.ID_USUARIO, ' +
+					'	us.NOMBRE, ' +
+					'	us.APELLIDOS, ' +
+					'	us.EMAIL, ' +
+					'	us.IMAGEN, ' +
+					'	us.FK_TIPO_USUARIO, ' +
+					'	us.CREATE_TIME, ' +
+					'	us.UPDATE_TIME, ' +
+					'	us.IS_ACTIVE, ' +
+					'	tipo.TIPO' +
+					' FROM' +
+					'	USUARIO us ' +
+					' INNER JOIN ' +
+					'	TIPO_USUARIO tipo ON ' +
+					'		tipo.ID_TIPO_USUARIO = us.FK_TIPO_USUARIO ' +
+					(filter ? " WHERE us.NOMBRE LIKE '%" + filter + "%'" : '') +
+					') t ORDER BY t.' + orderBy +
+					' ' + sortOrder +
+					'  LIMIT ' + initialPos + ', ' + pageSize;
 
 	dateGeneratorO.printSelect(query);
 	const rows = await connection.query(query);
 	connection.release();
-	const initialPos = pageNumber * pageSize;
-	return rows.slice(initialPos, initialPos + pageSize);
+	return rows;
 };
 
 const getUsuarioByIdAsync = async (req) => {
@@ -76,30 +77,18 @@ const getUsuarioByIdAsync = async (req) => {
 
 const countUsuariosAsync = async (req) => {
 	const connection = await mySqlPool.getConnection();
-	const query = 'SELECT COUNT(*) AS countUsuarios FROM usuario ' + (req.query.filter ? " WHERE nombre LIKE '%" + req.query.filter + "%'" : '');
+	const query = 'SELECT COUNT(*) AS countUsuarios FROM USUARIO ' + (req.query.filter ? " WHERE nombre LIKE '%" + req.query.filter + "%'" : '');
 	const rows = await connection.query(query);
 	connection.release();
 	return rows[0].countUsuarios;
 };
 
 const updateUsuarioAsync = async (req) => {
-	let query = 'UPDATE ' + '\n' +
-				'	USUARIO' + '\n' +
-				'SET' + '\n' +
-				'	PASSWORD = ?, ' + '\n' +
-				'	FK_TIPO_USUARIO = ?, ' + '\n' +
-				'	IMAGEN = ?, ' + '\n' +
-				'	UPDATE_TIME = CURRENT_TIMESTAMP' + '\n' +
-				'WHERE' + '\n' +
-				'	ID_USUARIO = ?';
-	const table = [md5(req.body.PASSWORD),
-		req.body.FK_TIPO_USUARIO,
-		req.body.FOTO,
-		req.body.ID_USUARIO];
-	query = mysql.format(query, table);
-	dateGeneratorO.printUpdate(query);
+	req.body.UPDATE_TIME = 'CURRENT_TIMESTAMP';
+	req.body.PASSWORD = md5(req.body.PASSWORD);
+	const columns = ['PASSWORD', 'FK_TIPO_USUARIO', 'IMAGEN', 'UPDATE_TIME'];
 	const connection = await mySqlPool.getConnection();
-	await connection.query(query);
+	await connection.query(sqlTools.updateQuery('USUARIO', columns, req.body));
 	connection.release();
 	return 'OK';
 };
