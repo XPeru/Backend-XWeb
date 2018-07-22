@@ -28,8 +28,8 @@ const getArguments = (req) => {
 	const queryParams = req.query;
 	const filter = queryParams.filter || '';
 	const sortOrder = queryParams.sortOrder;
-	const pageNumber = parseInt(queryParams.pageNumber) || 0;
-	const pageSize = parseInt(queryParams.pageSize);
+	const pageNumber = parseInt(queryParams.pageNumber, 10) || 0;
+	const pageSize = parseInt(queryParams.pageSize, 10);
 	const orderBy = queryParams.active || 'ID_USUARIO';
 	return { filter, sortOrder, pageNumber, pageSize, orderBy };
 };
@@ -104,7 +104,7 @@ const updateUsuarioAsync = async (req) => {
 	return 'OK';
 };
 
-const uploadUsuarioImageAsync = async (req) => {
+const uploadUsuarioImageAsync = async (req, res) => {
 	const pathFromFrontend = '/usuario-imagen/';
 	const pathFromBackend = './public/medias/usuario/';
 	const data = {

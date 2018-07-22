@@ -38,7 +38,7 @@ const createPoolMysql = function () {
 	global.mysql = mysql;
 };
 
-global.cf = function (asyncFunc) {
+global.cf = (asyncFunc) => {
     return function (req, res) {
         asyncFunc(req).then((val) => {
             res.json(val)

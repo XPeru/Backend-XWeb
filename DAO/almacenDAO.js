@@ -2,7 +2,7 @@ const dateGenerator = require('./dateGenerator.js');
 const dateGeneratorO = new dateGenerator('almacenDAO');
 const router = require('express').Router();
 
-const getAlmacenesAsync = async (req) => {
+const getAlmacenesAsync = async () => {
 	const query = "CALL SP_SEARCH_ALL('ALMACEN')";
 	dateGeneratorO.printSelect(query);
 	const connection = await mySqlPool.getConnection();

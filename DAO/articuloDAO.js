@@ -23,7 +23,7 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage }).single(baseFile);
 
-router.get('/list', cf(async (req) => {
+router.get('/list', cf(async () => {
 	dateGeneratorO.printSelect('list');
 	var query = 'SELECT ' + '\n' +
 				'	art.ID_ARTICULO,' + '\n' +

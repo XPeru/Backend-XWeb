@@ -5,7 +5,7 @@ var router = require('express').Router();
 
 dateGeneratorO.printStart();
 
-router.get('/list', cf(async (req) => {
+router.get('/list', cf(async () => {
 	dateGeneratorO.printSelect('list');
 	var query = "CALL SP_SEARCH_ALL('ACCESO_USUARIO')";
 	var table = [];
