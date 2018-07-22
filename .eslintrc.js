@@ -12,7 +12,8 @@ module.exports = {
         "mysql": true,
         "_": true,
         "debugLogger": true,
-        "mdw": true
+        "mdw": true,
+        "cf": true
     },
     "extends": "eslint:recommended",
     "parserOptions": {
