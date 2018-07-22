@@ -8,7 +8,7 @@ const path = require("path");
 const fileSystem = require("graceful-fs");
 const dotenv = require("dotenv");
 const compression = require("compression");
-const errorHandler = require("errorHandler");
+const errorhandler = require("errorhandler");
 const _ = require("underscore");
 
 const connectMysql = require("./connectMysql.js");
@@ -17,15 +17,15 @@ const sqlTools = require("./utils/sql.js");
 dotenv.config({ path: ".env.dev" });
 
 var app = express();
-app.use(favicon(path.join(__dirname, '../XWebApp/dev/media/favicon.ico')));
+app.use(favicon(path.join(__dirname, '../Angular5/src/favicon.ico')));
 app.use(compression());
-app.use(errorHandler());
+app.use(errorhandler());
 app.use(bodyParser.urlencoded({ limit: "150mb", extended: true }));
 app.use(bodyParser.json({ limit: "150mb" }));
 var router = express.Router();
 app.use('/api', router);
 // only for angularjs app -> to be deleted in the near future
-app.use(express.static(path.join(__dirname, '../XWebApp')));
+app.use(express.static(path.join(__dirname, '../Angular5')));
 const loadModule = function () {
 	return function (file) {
 		// avoiding IDE's files
