@@ -2,7 +2,7 @@ const dateGenerator = require("./dateGenerator.js");
 const dateGeneratorO = new dateGenerator("asoctipoaccesoDAO");
 const router = require("express").Router();
 
-const getAsocTipoAccesoAsync = async (req) {
+const getAsocTipoAccesoAsync = async (req) => {
 	let query = "SELECT " + "\n" +
 				"	acc.ID_ACCESO_USUARIO, " + "\n" +
 				"	acc.DESCRIPCION" + "\n" +
