@@ -1,6 +1,6 @@
-const dateGenerator = require("./dateGenerator.js");
-const dateGeneratorO = new dateGenerator("almacenDAO");
-const router = require("express").Router();
+const dateGenerator = require('./dateGenerator.js');
+const dateGeneratorO = new dateGenerator('almacenDAO');
+const router = require('express').Router();
 
 const getAlmacenesAsync = async (req) => {
 	const query = "CALL SP_SEARCH_ALL('ALMACEN')";
@@ -15,45 +15,45 @@ const createAlmacenAsync = async (req) => {
 	const almacen = {
 		codigo_almacen: req.body.CODIGO_ALMACEN,
 		ubicacion: req.body.UBICACION
-	}
-	const query = sqlTools.insertIntoQuery('almacen',[almacen]);
+	};
+	const query = sqlTools.insertIntoQuery('almacen', [almacen]);
 	dateGeneratorO.printInsert(query);
 	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	connection.release();
-	return "OK";
+	return 'OK';
 };
 
 const updateAlmacenAsync = async (req) => {
-	let query = "UPDATE" + "\n" +
-				"	ALMACEN " + "\n" +
-				"SET" + "\n" +
-				"	CODIGO_ALMACEN = ?, " + "\n" +
-				"	UBICACION = ? " + "\n" +
-				"WHERE " + "\n" +
-				"	ID_ALMACEN = ?";
-	const table = [	req.body.CODIGO_ALMACEN,
-									req.body.UBICACION,
-									req.body.ID_ALMACEN];
+	let query = 'UPDATE' + '\n' +
+				'	ALMACEN ' + '\n' +
+				'SET' + '\n' +
+				'	CODIGO_ALMACEN = ?, ' + '\n' +
+				'	UBICACION = ? ' + '\n' +
+				'WHERE ' + '\n' +
+				'	ID_ALMACEN = ?';
+	const table = [req.body.CODIGO_ALMACEN,
+		req.body.UBICACION,
+		req.body.ID_ALMACEN];
 	query = mysql.format(query, table);
 	dateGeneratorO.printUpdate(query);
 	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	connection.release();
-	return "OK";
+	return 'OK';
 };
 
 const deleteAlmacenById = async (req) => {
-	let query = "DELETE FROM" + "\n" +
-				"	ALMACEN" + "\n" +
-				"WHERE " + "\n" +
-				"	ID_ALMACEN = ?";
+	let query = 'DELETE FROM' + '\n' +
+				'	ALMACEN' + '\n' +
+				'WHERE ' + '\n' +
+				'	ID_ALMACEN = ?';
 	query = mysql.format(query, [req.params.id_almacen]);
 	dateGeneratorO.printDelete(query);
 	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	connection.release();
-	return "OK";
+	return 'OK';
 };
 
 router.get('/get', cf(getAlmacenesAsync));
