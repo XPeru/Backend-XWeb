@@ -91,7 +91,7 @@ exports.insertIntoQuery = (table_name, objs) => {
 	const valueQuery = `(${new Array(keys.length).fill('?').join(',')})`;
 	const valueListQuery = new Array(objs.length).fill(valueQuery).join(',');
 	const values = _.reduce(objs,
-		(values, obj) => values.concat(spanValue(obj, keys)),
+		(vs, obj) => vs.concat(spanValue(obj, keys)),
 		[]);
 	const keyListQuery = `(${new Array(keys.length).fill('??').join(',')})`;
 	const query = mysql.format(`INSERT INTO ?? ${keyListQuery} VALUES ${valueListQuery}`,
@@ -138,8 +138,8 @@ exports.updateQuery = (table_name, obj, keys) => {
 
 // sw means script wrapper
 exports.sw = (func) => {
-	func().then((val) => {
+	func().then(() => {
 	}).catch((err) => {
-		console.log(err);
+		debugLogger.logError(err);
 	});
 };
