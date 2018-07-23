@@ -120,7 +120,7 @@ exports.alterTableQuery = (data) => {
 };
 
 exports.updateQuery = (table_name, obj, keys) => {
-	const idName = `id_${table_name}`;
+	const idName = `ID_${table_name}`;
 	const where = `${obj[idName]} = ${idName}`;
 	const keyValueList = [];
 	_.each(obj, (value, key) => {
