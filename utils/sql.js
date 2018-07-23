@@ -135,6 +135,12 @@ exports.updateQuery = (table_name, obj, keys) => {
 	return mysql.format(query, [table_name].concat(keyValueList));
 };
 
+exports.deleteQuery = (table_name, obj) => {
+	const idName = `ID_${table_name}`;
+	const where = `${obj.id} = ${idName}`;
+	const query = `DELETE FROM ?? WHERE ${where}`;
+	return mysql.format(query, [table_name]);
+};
 
 // sw means script wrapper
 exports.sw = (func) => {
