@@ -1,96 +1,79 @@
-/* global mySqlPool, mysql */
-var dateGenerator = require('./dateGenerator.js');
-var dateGeneratorO = new dateGenerator('accesousuarioDAO');
-var router = require('express').Router();
+const dateGenerator = require('./dateGenerator.js');
+const dateGeneratorO = new dateGenerator('accesousuarioDAO');
+const router = require('express').Router();
 
 dateGeneratorO.printStart();
 
-router.get('/list', cf(async () => {
-	dateGeneratorO.printSelect('list');
-	var query = "CALL SP_SEARCH_ALL('ACCESO_USUARIO')";
-	var table = [];
-	query = mysql.format(query, table);
-	dateGeneratorO.printSelect(query);
-	var connection = await mySqlPool.getConnection();
-	var rows = await connection.query(query);
-	var result = {
-		AccesosUsuario: rows[0]
-	};
-	connection.release();
-	return result;
-}));
+const getArguments = (req) => {
+	const queryParams = req.query;
+	const filter = queryParams.filter || '';
+	const sortOrder = queryParams.sortOrder;
+	const pageSize = parseInt(queryParams.pageSize, 10) || 0;
+	const initialPos = (parseInt(queryParams.pageNumber, 10) || 0) * pageSize;
+	const orderBy = queryParams.active || 'DESCRIPCION';
+	return { filter, sortOrder, initialPos, pageSize, orderBy };
+};
 
-router.post('/', cf(async (req) => {
-	dateGeneratorO.printInsert('/');
-	var query = 'INSERT INTO ' + '\n' +
-				'   ACCESO_USUARIO (' + '\n' +
-				'       DESCRIPCION' + '\n' +
-				'   ) VALUES (' + '\n' +
-				'       ?' + '\n' +
-				'   )';
-	var table = [req.body.DESCRIPCION];
-	query = mysql.format(query, table);
-	dateGeneratorO.printInsert(query);
-	var connection = await mySqlPool.getConnection();
-	await connection.query(query);
-	var result = {
-		Message: 'OK'
-	};
+const getAccesosAsync = async (req) => {
+	const connection = await mySqlPool.getConnection();
+	const { filter, sortOrder, initialPos, pageSize, orderBy } = getArguments(req);
+	const query = 'SELECT * FROM ACCESO_USUARIO ' +
+		(filter ? ' WHERE DESCRIPCION LIKE "%' + filter + '%"' : '') +
+		' ORDER BY ' + orderBy +
+		' ' + sortOrder +
+		'  LIMIT ' + initialPos + ', ' + pageSize;
+	const rows = await connection.query(query);
 	connection.release();
-	return result;
-}));
+	return rows;
+};
 
-router.put('/', cf(async (req) => {
-	dateGeneratorO.printUpdate('/');
-	var query = 'UPDATE ' + '\n' +
-				'   ACCESO_USUARIO ' + '\n' +
-				'SET ' + '\n' +
-				'   DESCRIPCION = ? ' + '\n' +
-				'WHERE ' + '\n' +
-				'   ID_ACCESO_USUARIO = ?';
-	var table = [req.body.DESCRIPCION, req.body.ID_ACCESO_USUARIO];
-	query = mysql.format(query, table);
-	dateGeneratorO.printUpdate(query);
-	var connection = await mySqlPool.getConnection();
-	await connection.query(query);
-	var result = {
-		Message: 'OK'
-	};
+const countAccesosAsync = async (req) => {
+	const connection = await mySqlPool.getConnection();
+	const query = 'SELECT COUNT(*) AS countAccesos FROM ACCESO_USUARIO ' + (req.query.filter ? ' WHERE DESCRIPCION LIKE "%' + req.query.filter + '%"' : '');
+	const rows = await connection.query(query);
 	connection.release();
-	return result;
-}));
+	return rows[0].countAccesos;
+};
 
-router.get('/:id_acceso_usuario', cf(async (req) => {
-	dateGeneratorO.printSelect('/:id_acceso_usuario');
-	var query = "CALL SP_SEARCH('ACCESO_USUARIO','ID_ACCESO_USUARIO',?)";
-	var table = [req.params.id_acceso_usuario];
-	query = mysql.format(query, table);
-	dateGeneratorO.printSelect(query);
-	var connection = await mySqlPool.getConnection();
-	var rows = await connection.query(query);
-	var result = {
-		AccesoUsuario: rows[0]
+const createAccesoAsync = async (req) => {
+	const acceso = {
+		DESCRIPCION: req.body.DESCRIPCION
 	};
+	const connection = await mySqlPool.getConnection();
+	await connection.query(sqlTools.insertIntoQuery('ACCESO_USUARIO', [acceso]));
 	connection.release();
-	return result;
-}));
+	return 'OK';
+};
 
-router.delete('/:id_acceso_usuario', cf(async (req) => {
-	dateGeneratorO.printDelete('/:id_acceso_usuario');
-	var query = 'DELETE FROM ' + '\n' +
-				'   ACCESO_USUARIO ' + '\n' +
-				'WHERE ' + '\n' +
-				'   ID_ACCESO_USUARIO=?';
-	var table = [req.params.id_acceso_usuario];
-	query = mysql.format(query, table);
-	dateGeneratorO.printDelete(query);
-	var connection = await mySqlPool.getConnection();
-	await connection.query(query);
-	var result = {
-		Message: 'OK'
-	};
+const updateAccesoAsync = async (req) => {
+	const columns = ['DESCRIPCION'];
+	const connection = await mySqlPool.getConnection();
+	await connection.query(sqlTools.updateQuery('ACCESO_USUARIO', req.body, columns));
 	connection.release();
-	return result;
-}));
+	return 'OK';
+};
+
+const getAccesoByIdAsync = async (req) => {
+	const connection = await mySqlPool.getConnection();
+	const id_acceso_usuario = req.params.id;
+	const query = 'SELECT * FROM ACCESO_USUARIO WHERE ID_ACCESO_USUARIO = ?';
+	const result = await connection.query(mysql.format(query, id_acceso_usuario));
+	connection.release();
+	return result[0];
+};
+
+const deleteAccesoAsync = async (req) => {
+	var connection = await mySqlPool.getConnection();
+	await connection.query(sqlTools.deleteQuery('ACCESO_USUARIO', req.params));
+	connection.release();
+	return 'OK';
+};
+
+router.get('/get', cf(getAccesosAsync));
+router.post('/create', cf(createAccesoAsync));
+router.put('/update', cf(updateAccesoAsync));
+router.get('/get/:id', cf(getAccesoByIdAsync));
+router.delete('/:id', cf(deleteAccesoAsync));
+router.get('/count', cf(countAccesosAsync));
 
 exports.router = router;
