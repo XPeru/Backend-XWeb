@@ -73,7 +73,7 @@ router.get('/get', cf(getAccesosAsync));
 router.post('/create', cf(createAccesoAsync));
 router.put('/update', cf(updateAccesoAsync));
 router.get('/get/:id', cf(getAccesoByIdAsync));
-router.delete('/:id', cf(deleteAccesoAsync));
+router.delete('/delete/:id', cf(deleteAccesoAsync));
 router.get('/count', cf(countAccesosAsync));
 
 exports.router = router;
