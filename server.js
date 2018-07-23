@@ -1,27 +1,27 @@
 //Express is a minimalist web framework for node.js
-const express = require("express");
+const express = require('express');
 // This allows our server to parse JSONs objects
-const bodyParser = require("body-parser");
-const favicon = require("serve-favicon");
+const bodyParser = require('body-parser');
+const favicon = require('serve-favicon');
 const colors = require('colors');
-const path = require("path");
-const fileSystem = require("graceful-fs");
-const dotenv = require("dotenv");
-const compression = require("compression");
-const errorhandler = require("errorhandler");
-const _ = require("underscore");
+const path = require('path');
+const fileSystem = require('graceful-fs');
+const dotenv = require('dotenv');
+const compression = require('compression');
+const errorhandler = require('errorhandler');
+const _ = require('underscore');
 
-const connectMysql = require("./connectMysql.js");
-const sqlTools = require("./utils/sql.js");
+const connectMysql = require('./connectMysql.js');
+const sqlTools = require('./utils/sql.js');
 
-dotenv.config({ path: ".env.dev" });
+dotenv.config({ path: '.env.dev' });
 
 var app = express();
 app.use(favicon(path.join(__dirname, '../Angular5/src/favicon.ico')));
 app.use(compression());
 app.use(errorhandler());
-app.use(bodyParser.urlencoded({ limit: "150mb", extended: true }));
-app.use(bodyParser.json({ limit: "150mb" }));
+app.use(bodyParser.urlencoded({ limit: '150mb', extended: true }));
+app.use(bodyParser.json({ limit: '150mb' }));
 var router = express.Router();
 app.use('/api', router);
 // only for angularjs app -> to be deleted in the near future
@@ -29,48 +29,48 @@ app.use(express.static(path.join(__dirname, '../Angular5')));
 const loadModule = function () {
 	return function (file) {
 		// avoiding IDE's files
-				if (file.charAt(0) === ".") {
-		    	return;
-				}
-        const format = file.slice(-6, -3);
-        const mod = require("./DAO/" + file);
-        // only DAO files for routes
-        if (format === "DAO") {
-            const path = file.slice(0, -6);
-            app.use("/api/" + path, mod.router);
-        }
-    };
+		if (file.charAt(0) === '.') {
+			return;
+		}
+		const format = file.slice(-6, -3);
+		const mod = require('./DAO/' + file);
+		// only DAO files for routes
+		if (format === 'DAO') {
+			const pathF = file.slice(0, -6);
+			app.use('/api/' + pathF, mod.router);
+		}
+	};
 };
-fileSystem.readdirSync("./DAO").forEach(loadModule());
+fileSystem.readdirSync('./DAO').forEach(loadModule());
 connectMysql.createPoolMysql();
 
 
 const MAX_DEPTH = 10;
 // Delete keys starting by $ to avoid NoSQL injections
 var sanitizeInput = function (body, depth = 0) {
-    if (body instanceof Object) {
-        Object.keys(body).forEach(key => {
-            if (/^\$/.test(key) || depth > MAX_DEPTH) {
-                delete body[key];
-                throw new Error("Body with nested object detected");
-            } else {
-                sanitizeInput(body[key], depth + 1);
-            }
-        });
-    }
+	if (body instanceof Object) {
+		Object.keys(body).forEach((key) => {
+			if (/^\$/.test(key) || depth > MAX_DEPTH) {
+				delete body[key];
+				throw new Error('Body with nested object detected');
+			} else {
+				sanitizeInput(body[key], depth + 1);
+			}
+		});
+	}
 };
 
 app.use(function (req, res, next) {
-    sanitizeInput(req.body);
-    sanitizeInput(req.query);
-    next();
+	sanitizeInput(req.body);
+	sanitizeInput(req.query);
+	next();
 });
 
 //making underscorejs available for all modules
 global._ = _;
 global.sqlTools = sqlTools;
 app.listen(process.env.PORT, function () {
-    console.log(colors.green("All right ! I am alive at Port " + process.env.PORT));
+	console.log(colors.green('All right ! I am alive at Port ' + process.env.PORT));
 });
 // var PDFDocument = require("pdfkit");
 // var blobStream  = require("blob-stream");
