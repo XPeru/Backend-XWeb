@@ -53,19 +53,6 @@ const updateAlmacenAsync = async (req) => {
 	await connection.query(sqlTools.updateQuery('ALMACEN', req.body, columns));
 	connection.release();
 	return 'OK';
-
-	// let query = 'UPDATE' + '\n' +
-	// 			'	ALMACEN ' + '\n' +
-	// 			'SET' + '\n' +
-	// 			'	CODIGO_ALMACEN = ?, ' + '\n' +
-	// 			'	UBICACION = ? ' + '\n' +
-	// 			'WHERE ' + '\n' +
-	// 			'	ID_ALMACEN = ?';
-	// const table = [req.body.CODIGO_ALMACEN,
-	// 	req.body.UBICACION,
-	// 	req.body.ID_ALMACEN];
-	// query = mysql.format(query, table);
-	// dateGeneratorO.printUpdate(query);
 };
 
 const getAlmacenByIdAsync = async (req) => {
@@ -82,13 +69,6 @@ const deleteAlmacenAsync = async (req) => {
 	await connection.query(sqlTools.deleteQuery('ALMACEN', req.params));
 	connection.release();
 	return 'OK';
-
-	// let query = 'DELETE FROM' + '\n' +
-	// 			'	ALMACEN' + '\n' +
-	// 			'WHERE ' + '\n' +
-	// 			'	ID_ALMACEN = ?';
-	// query = mysql.format(query, [req.params.id_almacen]);
-	// dateGeneratorO.printDelete(query);
 };
 
 router.get('/get', cf(getAlmacenesAsync));
@@ -97,10 +77,5 @@ router.put('/update', cf(updateAlmacenAsync));
 router.get('/get/:id', cf(getAlmacenByIdAsync));
 router.delete('/delete/:id', cf(deleteAlmacenAsync));
 router.get('/count', cf(countAlmacenesAsync));
-
-// router.get('/get', cf(getAlmacenesAsync));
-// router.post('/create', cf(createAlmacenAsync));
-// router.put('/update', cf(updateAlmacenAsync));
-// router.delete('/delete/:id', cf(deleteAlmacenById));
 
 exports.router = router;
