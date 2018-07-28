@@ -2,14 +2,14 @@ const sqlPool = require('../utils/standalone.js');
 const sqlTools = require('../utils/sql.js');
 
 const table = {
-	table_name: 'ACCESO_USUARIO',
+	table_name: 'TIPO_USUARIO',
 	fields: [
 		{
-			name: 'ID_ACCESO_USUARIO'
+			name: 'ID_TIPO_USUARIO'
 		},
 		{
-			name: 'DESCRIPCION',
-			type: 'VARCHAR(45)',
+			name: 'TIPO',
+			type: 'VARCHAR(100)',
 			notNull: true
 		},
 		{

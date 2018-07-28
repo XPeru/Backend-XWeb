@@ -1,11 +1,11 @@
 const sqlPool = require('../utils/standalone.js');
 const sqlTools = require('../utils/sql.js');
 
-const buildData = (accesos) => {
+const buildData = (tipos) => {
 	const res = [];
-	_.each(accesos, (acceso) => {
+	_.each(tipos, (tipo) => {
 		const e = {
-			DESCRIPCION: acceso
+			TIPO: tipo
 		};
 		res.push(e);
 	});
@@ -15,18 +15,11 @@ const buildData = (accesos) => {
 sqlTools.sw(async () => {
 	const connection = await sqlPool.connection();
 	await connection.query('USE ' + process.env.MYSQL_DATABASE_NAME);
-	const accesos = ['ACCESO_USUARIO',
-		'TIPO_USUARIO',
-		'GESTION_USUARIO',
-		'ALMACEN',
-		'INGRESO',
-		'SALIDA',
-		'TRANSFORMADOR',
-		'VENTA',
-		'DASHBOARD',
-		'PROVEEDORES',
-		'CLIENTES'];
-	await connection.query(sqlTools.insertIntoQuery('ACCESO_USUARIO', buildData(accesos)));
+	const tipos = ['SUPERUSUARIO',
+		'ADMINISTRADOR',
+		'EMPLEADO',
+		'SUBEMPLEADO'];
+	await connection.query(sqlTools.insertIntoQuery('TIPO_USUARIO', buildData(tipos)));
 	await connection.commit();
 	await connection.end();
 });
