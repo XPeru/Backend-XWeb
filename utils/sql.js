@@ -137,6 +137,8 @@ exports.updateQuery = (table_name, obj, keys) => {
 
 exports.randomString = () => Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
 
+exports.randomId = max => Math.random() * (max - 1) + 1;
+
 exports.deleteQuery = (table_name, obj) => {
 	const idName = `ID_${table_name}`;
 	const where = `${obj.id} = ${idName}`;
