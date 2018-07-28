@@ -2,9 +2,9 @@ const _ = require('underscore');
 const mysql = require('promise-mysql');
 const debugLogger = require('./debugLogger.js');
 
-const isId = field => field.name.slice(0, 2) === 'id';
+const isId = field => field.name.slice(0, 2) === 'ID';
 
-const isFk = field => field.name.slice(0, 2) === 'fk';
+const isFk = field => field.name.slice(0, 2) === 'FK';
 
 const buildColumn = (field) => {
 	if (isId(field)) {
@@ -21,7 +21,7 @@ const pk = pkName => mysql.format('PRIMARY KEY ( ?? )', pkName);
 
 const fksF = fks => fks.map((fk) => {
 	var fk_table = fk.name.substring(3);
-	var fk_id = `id_${fk_table}`;
+	var fk_id = `ID_${fk_table}`;
 	return mysql.format(
 		'CONSTRAINT FOREIGN KEY (??) REFERENCES ?? ( ?? )',
 		[fk.name + (fk.complement ? fk.complement : ''), fk_table, fk_id]);
@@ -134,6 +134,8 @@ exports.updateQuery = (table_name, obj, keys) => {
 
 	return mysql.format(query, [table_name].concat(keyValueList));
 };
+
+exports.randomString = () => Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
 
 exports.deleteQuery = (table_name, obj) => {
 	const idName = `ID_${table_name}`;
