@@ -14,7 +14,7 @@ const _ = require('underscore');
 const connectMysql = require('./connectMysql.js');
 const sqlTools = require('./utils/sql.js');
 
-dotenv.config({ path: '.env.dev' });
+dotenv.config({ path: '.env' });
 
 var app = express();
 app.use(favicon(path.join(__dirname, '../Angular5/src/favicon.ico')));
