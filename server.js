@@ -3,13 +3,13 @@ const express = require('express');
 // This allows our server to parse JSONs objects
 const bodyParser = require('body-parser');
 const favicon = require('serve-favicon');
-const colors = require('colors');
 const path = require('path');
 const fileSystem = require('graceful-fs');
 const dotenv = require('dotenv');
 const compression = require('compression');
 const errorhandler = require('errorhandler');
 const _ = require('underscore');
+const debugLogger = require('./utils/debugLogger.js');
 
 const connectMysql = require('./connectMysql.js');
 const sqlTools = require('./utils/sql.js');
@@ -26,22 +26,23 @@ var router = express.Router();
 app.use('/api', router);
 // only for angularjs app -> to be deleted in the near future
 app.use(express.static(path.join(__dirname, '../Angular5')));
-const loadModule = function () {
-	return function (file) {
-		// avoiding IDE's files
-		if (file.charAt(0) === '.') {
-			return;
+
+const loadModule = (folder) => {
+	// avoiding IDE's files
+	if (folder.charAt(0) === '.') {
+		return;
+	}
+	fileSystem.readdirSync('./modules/' + folder).forEach((file) => {
+		if (file.endsWith('.routes.js')) {
+			debugLogger.glog('=> Creating route from file: ' + file);
+			const mod = require('./modules/' + folder + '/' + file.slice(0, -3));
+			debugLogger.glog('route is ' + '/api/' + file.slice(0, -10));
+			app.use('/api/' + file.slice(0, -10), mod.router);
 		}
-		const format = file.slice(-6, -3);
-		const mod = require('./DAO/' + file);
-		// only DAO files for routes
-		if (format === 'DAO') {
-			const pathF = file.slice(0, -6);
-			app.use('/api/' + pathF, mod.router);
-		}
-	};
+	});
 };
-fileSystem.readdirSync('./DAO').forEach(loadModule());
+fileSystem.readdirSync('./modules').forEach(loadModule);
+
 connectMysql.createPoolMysql();
 
 
@@ -69,8 +70,8 @@ app.use(function (req, res, next) {
 //making underscorejs available for all modules
 global._ = _;
 global.sqlTools = sqlTools;
-app.listen(process.env.PORT, function () {
-	console.log(colors.green('All right ! I am alive at Port ' + process.env.PORT));
+app.listen(process.env.PORT, () => {
+	debugLogger.glog('All right ! I am alive at Port ' + process.env.PORT);
 });
 // var PDFDocument = require("pdfkit");
 // var blobStream  = require("blob-stream");

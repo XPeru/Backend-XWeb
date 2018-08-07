@@ -1,5 +1,3 @@
-const dateGenerator = require('./dateGenerator.js');
-const dateGeneratorO = new dateGenerator('asoctipoaccesoDAO');
 const router = require('express').Router();
 
 const getAsocTipoAccesoAsync = async (req) => {
@@ -13,7 +11,6 @@ const getAsocTipoAccesoAsync = async (req) => {
 				'WHERE' + '\n' +
 				'	asso.FK_TIPO_USUARIO = ?';
 	query = mysql.format(query, [req.params.id_tipo_usuario]);
-	dateGeneratorO.printSelect(query);
 	const connection = await mySqlPool.getConnection();
 	const rows = await connection.query(query);
 	connection.release();
@@ -35,7 +32,6 @@ const createAsocTipoAccesoAsync = async (req) => {
 		return tabla;
 	}, []);
 	query = mysql.format(query.slice(0, -1), table);
-	dateGeneratorO.printInsert(query);
 	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	connection.release();
@@ -48,7 +44,6 @@ const deleteAsocTipoAccesoAsync = async (req) => {
 				'WHERE ' + '\n' +
 				'	FK_TIPO_USUARIO = ?';
 	query = mysql.format(query, [req.params.id_tipo_usuario]);
-	dateGeneratorO.printDelete(query);
 	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	connection.release();

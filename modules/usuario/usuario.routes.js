@@ -1,6 +1,4 @@
-const dateGenerator = require('./dateGenerator.js');
-const dateGeneratorO = new dateGenerator('usuarioDAO');
-const fileOperations = require('../utils/fileOperations.js');
+const fileOperations = require('../../utils/fileOperations.js');
 // For hash encryption, used for passwords
 const md5 = require('MD5');
 const router = require('express').Router();
@@ -16,7 +14,6 @@ const createUsuarioAsync = async (req) => {
 		imagen: req.body.FOTO
 	};
 	const query = sqlTools.insertIntoQuery('USUARIO', [usuario]);
-	dateGeneratorO.printInsert(query);
 	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	connection.release();
@@ -59,7 +56,6 @@ const getUsuariosAsync = async (req) => {
 					' ' + sortOrder +
 					'  LIMIT ' + initialPos + ', ' + pageSize;
 
-	dateGeneratorO.printSelect(query);
 	const rows = await connection.query(query);
 	connection.release();
 	return rows;
@@ -68,7 +64,6 @@ const getUsuariosAsync = async (req) => {
 const getUsuarioByIdAsync = async (req) => {
 	let query = "CALL SP_SEARCH('USUARIO','ID_USUARIO',?)";
 	query = mysql.format(query, [req.params.id_usuario]);
-	dateGeneratorO.printSelect(query);
 	const connection = await mySqlPool.getConnection();
 	const rows = await connection.query(query);
 	connection.release();
@@ -118,7 +113,6 @@ const desactivateUsuarioAsync = async (req) => {
 
 	const table = [false, req.body.ID_USUARIO];
 	query = mysql.format(query, table);
-	dateGeneratorO.printUpdate(query);
 	const connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	connection.release();
@@ -127,7 +121,6 @@ const desactivateUsuarioAsync = async (req) => {
 
 
 router.get('/authentication/:usuario_email/:usuario_password', cf(async (req) => {
-	dateGeneratorO.printSelect('/authentication/:usuario_email/:usuario_password');
 	var query = 'SELECT ' + '\n' +
 				'	* ' + '\n' +
 				'FROM ' + '\n' +
@@ -139,7 +132,6 @@ router.get('/authentication/:usuario_email/:usuario_password', cf(async (req) =>
 	var table = [req.params.usuario_email,
 		md5(req.params.usuario_password)];
 	query = mysql.format(query, table);
-	dateGeneratorO.printSelect(query);
 	var connection = await mySqlPool.getConnection();
 	var rows = await connection.query(query);
 	var result = {

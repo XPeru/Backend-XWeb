@@ -1,15 +1,11 @@
 /* global mySqlPool, mysql */
 var multer = require('multer');
-var dateGenerator = require('./dateGenerator.js');
-var dateGeneratorO = new dateGenerator('articuloDAO');
 //this path has to exist before running the server
 var pathUpload = './dev/media/articulos/';
 var finalNameFile;
 var completePathFile;
 var baseFile = 'articleImage';
 var router = require('express').Router();
-
-dateGeneratorO.printStart();
 
 var storage = multer.diskStorage({
 	destination: function (req, file, callback) {
@@ -24,7 +20,7 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage }).single(baseFile);
 
 router.get('/list', cf(async () => {
-	dateGeneratorO.printSelect('list');
+
 	var query = 'SELECT ' + '\n' +
 				'	art.ID_ARTICULO,' + '\n' +
 				'	art.CODIGO_ARTICULO,' + '\n' +
@@ -41,7 +37,7 @@ router.get('/list', cf(async () => {
 				'	cat.ID_CATEGORIA = art.FK_CATEGORIA';
 	var table = [];
 	query = mysql.format(query, table);
-	dateGeneratorO.printSelect(query);
+
 	var connection = await mySqlPool.getConnection();
 	var rows = await connection.query(query);
 	var result = {
@@ -52,7 +48,6 @@ router.get('/list', cf(async () => {
 }));
 
 router.post('/', cf(async (req) => {
-	dateGeneratorO.printInsert();
 	var query = 'INSERT INTO' + '\n' +
 				'	ARTICULO (' + '\n' +
 				'		CODIGO_ARTICULO,' + '\n' +
@@ -80,7 +75,6 @@ router.post('/', cf(async (req) => {
 		req.body.FK_CATEGORIA,
 		req.body.IMAGEN];
 	query = mysql.format(query, table);
-	dateGeneratorO.printInsert(query);
 	var connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	var result = {
@@ -91,11 +85,9 @@ router.post('/', cf(async (req) => {
 }));
 
 router.get('/:id_articulo', cf(async (req) => {
-	dateGeneratorO.printSelect(' :id_articulo');
 	var query = "CALL SP_SEARCH('ARTICULO','ID_ARTICULO',?)";
 	var table = [req.params.id_articulo];
 	query = mysql.format(query, table);
-	dateGeneratorO.printSelect(query);
 	var connection = await mySqlPool.getConnection();
 	var rows = await connection.query(query);
 	var result = {
@@ -106,7 +98,6 @@ router.get('/:id_articulo', cf(async (req) => {
 }));
 
 router.put('/', cf(async (req) => {
-	dateGeneratorO.printUpdate();
 	var query = 'UPDATE' + '\n' +
 				'	ARTICULO' + '\n' +
 				'SET ' + '\n' +
@@ -129,7 +120,6 @@ router.put('/', cf(async (req) => {
 		req.body.ID_ARTICULO];
 
 	query = mysql.format(query, table);
-	dateGeneratorO.printUpdate(query);
 	var connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	var result = {
@@ -140,11 +130,8 @@ router.put('/', cf(async (req) => {
 }));
 
 router.post('/image', function (req, res) {
-	dateGeneratorO.printInsert('image');
-	dateGeneratorO.printInsert(req);
 	upload(req, res, function (error) {
 		if (error) {
-			dateGeneratorO.printError(req, error.message);
 			return res.end('Error uploading file.');
 		}
 		res.end(completePathFile);

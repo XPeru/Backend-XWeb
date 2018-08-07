@@ -1,12 +1,7 @@
 /* global mySqlPool, mysql */
-var dateGenerator = require('./dateGenerator.js');
-var dateGeneratorO = new dateGenerator('personaDAO');
 var router = require('express').Router();
 
-dateGeneratorO.printStart();
-
 router.get('/list/:desc', cf(async (req) => {
-	dateGeneratorO.printSelect('list');
 	var query = 'SELECT ' + '\n' +
 				'	pc.ID_PROVEEDOR_CLIENTE, ' + '\n' +
 				'	pc.NOMBRE, ' + '\n' +
@@ -27,7 +22,6 @@ router.get('/list/:desc', cf(async (req) => {
 				'	tipo.DESCRIPCION = ?';
 	var table = [req.params.desc];
 	query = mysql.format(query, table);
-	dateGeneratorO.printSelect(query);
 	var connection = await mySqlPool.getConnection();
 	var rows = await connection.query(query);
 	var result = {
@@ -38,7 +32,6 @@ router.get('/list/:desc', cf(async (req) => {
 }));
 
 router.post('/', cf(async (req) => {
-	dateGeneratorO.printInsert('/');
 	var query = 'INSERT INTO ' + '\n' +
 				'	PROVEEDOR_CLIENTE (' + '\n' +
 				'		NOMBRE,' + '\n' +
@@ -74,7 +67,6 @@ router.post('/', cf(async (req) => {
 		req.body.TELEFONO,
 		req.body.FK_TIPO_PERSONA];
 	query = mysql.format(query, table);
-	dateGeneratorO.printInsert(query);
 	var connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	var result = {
@@ -85,7 +77,6 @@ router.post('/', cf(async (req) => {
 }));
 
 router.put('/', cf(async (req) => {
-	dateGeneratorO.printUpdate('/');
 	var query = 'UPDATE ' + '\n' +
 				'	PROVEEDOR_CLIENTE' + '\n' +
 				'SET' + '\n' +
@@ -107,7 +98,6 @@ router.put('/', cf(async (req) => {
 		req.body.TELEFONO,
 		req.body.ID_PROVEEDOR_CLIENTE];
 	query = mysql.format(query, table);
-	dateGeneratorO.printUpdate(query);
 	var connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	var result = {
@@ -118,14 +108,12 @@ router.put('/', cf(async (req) => {
 }));
 
 router.delete('/:id_proveedor_cliente', cf(async (req) => {
-	dateGeneratorO.printDelete('/:id_proveedor_cliente');
 	var query = 'DELETE FROM' + '\n' +
 				'	PROVEEDOR_CLIENTE' + '\n' +
 				'WHERE ' + '\n' +
 				'	ID_PROVEEDOR_CLIENTE = ?';
 	var table = [req.params.id_proveedor_cliente];
 	query = mysql.format(query, table);
-	dateGeneratorO.printDelete(query);
 	var connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	var result = {

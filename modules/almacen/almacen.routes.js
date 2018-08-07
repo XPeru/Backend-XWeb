@@ -1,8 +1,4 @@
-const dateGenerator = require('./dateGenerator.js');
-const dateGeneratorO = new dateGenerator('almacenDAO');
 const router = require('express').Router();
-
-dateGeneratorO.printStart();
 
 const getArguments = (req) => {
 	const queryParams = req.query;

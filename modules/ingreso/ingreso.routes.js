@@ -1,12 +1,7 @@
 /* global mySqlPool, mysql */
-var dateGenerator = require('./dateGenerator.js');
-var dateGeneratorO = new dateGenerator('ingresoDAO');
 var router = require('express').Router();
 
-dateGeneratorO.printStart();
-
 router.get('/list', cf(async () => {
-	dateGeneratorO.printSelect('list');
 	var query = 'SELECT ' + '\n' +
 				'	ing.ID_INGRESO, ' + '\n' +
 				'	ing.CODE_INGRESO, ' + '\n' +
@@ -34,7 +29,6 @@ router.get('/list', cf(async () => {
 				'	tdoc.ID_TIPO_DOCUMENTO = ing.FK_TIPO_DOCUMENTO';
 	var table = [];
 	query = mysql.format(query, table);
-	dateGeneratorO.printSelect(query);
 	var connection = await mySqlPool.getConnection();
 	var rows = await connection.query(query);
 	var result = {
@@ -45,7 +39,6 @@ router.get('/list', cf(async () => {
 }));
 
 router.post('/', cf(async (req) => {
-	dateGeneratorO.printInsert('/');
 	var query = 'INSERT INTO ' + '\n' +
 				'	INGRESO (' + '\n' +
 				'		CODE_INGRESO,' + '\n' +
@@ -73,7 +66,6 @@ router.post('/', cf(async (req) => {
 		req.body.FK_TIPO_DOCUMENTO,
 		req.body.FECHA_INGRESO];
 	query = mysql.format(query, table);
-	dateGeneratorO.printInsert(query);
 	var connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	var result = {
@@ -84,7 +76,6 @@ router.post('/', cf(async (req) => {
 }));
 
 router.put('/', cf(async (req) => {
-	dateGeneratorO.printUpdate('/');
 	var query = 'UPDATE ' + '\n' +
 				'	INGRESO ' + '\n' +
 				'SET ' + '\n' +
@@ -98,7 +89,6 @@ router.put('/', cf(async (req) => {
 		req.body.FECHA_INGRESO,
 		req.body.ID_INGRESO];
 	query = mysql.format(query, table);
-	dateGeneratorO.printUpdate(query);
 	var connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	var result = {
@@ -109,14 +99,12 @@ router.put('/', cf(async (req) => {
 }));
 
 router.delete('/:id_ingreso', cf(async (req) => {
-	dateGeneratorO.printDelete('/:id_ingreso');
 	var query = 'DELETE FROM' + '\n' +
 				'	INGRESO' + '\n' +
 				'WHERE ' + '\n' +
 				'	ID_INGRESO = ?';
 	var table = [req.params.id_ingreso];
 	query = mysql.format(query, table);
-	dateGeneratorO.printDelete(query);
 	var connection = await mySqlPool.getConnection();
 	await connection.query(query);
 	var result = {
