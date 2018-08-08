@@ -7,14 +7,20 @@ const isId = field => field.name.slice(0, 2) === 'ID';
 const isFk = field => field.name.slice(0, 2) === 'FK';
 
 const buildColumn = (field) => {
+	let column = `${field.name}`;
 	if (isId(field)) {
-		return `${field.name} INT NOT NULL AUTO_INCREMENT`;
-	} else if (isFk(field)) {
-		return `${field.name}${field.complement ? field.complement : ''} INT ${field.notNull ? 'NOT NULL' : 'NULL'}`;
+		column = `${column} INT NOT NULL AUTO_INCREMENT`;
 	} else {
-		return `${field.name} ${field.type} ${field.notNull ? 'NOT NULL' : 'NULL'}`
-			.concat(field.default ? ` DEFAULT ${field.default}` : '');
+		if (isFk(field)) {
+			column = `${column}${field.complement ? field.complement : ''} INT`;
+		} else {
+			column = `${column} ${field.type}`;
+		}
+		column = `${column} ${field.notNull ? 'NOT NULL' : 'NULL'}`;
 	}
+	column = `${column} ${field.default ? 'DEFAULT ' + field.default : ''}`;
+	column = `${column} ${field.comment ? "COMMENT '" + field.comment + "'" : ''}`;
+	return column;
 };
 
 const pk = pkName => mysql.format('PRIMARY KEY ( ?? )', pkName);
