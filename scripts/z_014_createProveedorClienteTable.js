@@ -16,38 +16,38 @@ const table = {
 			name: 'EMAIL',
 			type: 'VARCHAR(100)',
 			notNull: true
-    },
+		},
 		{
 			name: 'RUC',
 			type: 'VARCHAR(45)'
-    },
+		},
 		{
 			name: 'NUMERO_CUENTA',
 			type: 'VARCHAR(45)'
-    },
+		},
 		{
 			name: 'DIRECCION_CALLE',
 			type: 'VARCHAR(45)'
-    }, 
+		},
 		{
 			name: 'DIRECCION_DISTRITO',
 			type: 'VARCHAR(45)'
-    },
+		},
 		{
 			name: 'DIRECCION_DEPARTAMENTO',
 			type: 'VARCHAR(45)'
-    },
+		},
 		{
 			name: 'DIRECCION_COMPLEMENTO',
 			type: 'VARCHAR(45)'
-    },
+		},
 		{
 			name: 'TELEFONO',
 			type: 'VARCHAR(12)'
-    }, 
+		},
 		{
 			name: 'FK_TIPO_PERSONA'
-		}                                  
+		}
 	]
 };
 

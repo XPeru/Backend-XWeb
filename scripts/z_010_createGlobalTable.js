@@ -16,37 +16,37 @@ const table = {
 			name: 'RUC',
 			type: 'VARCHAR(45)',
 			notNull: true
-    },
+		},
 		{
 			name: 'DIRECCION',
 			type: 'VARCHAR(200)',
 			notNull: true
-    },
+		},
 		{
 			name: 'EMAIL',
 			type: 'VARCHAR(45)',
 			notNull: true
-    },
+		},
 		{
 			name: 'TELEFONO',
 			type: 'VARCHAR(20)'
-    },
+		},
 		{
 			name: 'LOGO',
 			type: 'VARCHAR(200)'
-    },
+		},
 		{
 			name: 'IMPUESTO',
 			type: 'DECIMAL(10,2)'
-    },
+		},
 		{
 			name: 'MONEDA',
 			type: 'VARCHAR(5)'
-    },
+		},
 		{
 			name: 'NOMBRE_IMPUESTO',
 			type: 'VARCHAR(45)'
-    }                       
+		}
 	]
 };
 

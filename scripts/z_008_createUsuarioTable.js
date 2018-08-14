@@ -16,41 +16,41 @@ const table = {
 			name: 'APELLIDOS',
 			type: 'VARCHAR(100)',
 			notNull: true
-    },
+		},
 		{
 			name: 'EMAIL',
 			type: 'VARCHAR(100)',
 			notNull: true
-    },
+		},
 		{
 			name: 'PASSWORD',
 			type: 'VARCHAR(256)',
 			notNull: true
-    },
+		},
 		{
 			name: 'FOTO',
 			type: 'VARCHAR(100)',
 			notNull: true
-    },
+		},
 		{
 			name: 'IS_ACTIVE',
 			type: 'BOOLEAN',
 			notNull: true,
 			default: '1'
-    }, 
+		},
 		{
 			name: 'CREATE_TIME',
 			type: 'TIMESTAMP',
 			notNull: true,
 			default: 'CURRENT_TIMESTAMP'
-    },  
+		},
 		{
 			name: 'UPDATE_TIME',
 			type: 'TIMESTAMP'
-    },      
+		},
 		{
 			name: 'FK_TIPO_USUARIO'
-		}                       
+		}
 	]
 };
 

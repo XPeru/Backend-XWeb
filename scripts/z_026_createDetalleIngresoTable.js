@@ -2,45 +2,38 @@ const sqlPool = require('../utils/standalone.js');
 const sqlTools = require('../utils/sql.js');
 
 const table = {
-	table_name: 'INGRESO',
+	table_name: 'DETALLE_INGRESO',
 	fields: [
 		{
-			name: 'ID_INGRESO'
+			name: 'ID_DETALLE_INGRESO',
+			comment: 'Secuencia de Ingreso Detallado'
 		},
 		{
-			name: 'CODE_INGRESO',
-			type: 'VARCHAR(45)'
+			name: 'CANTIDAD',
+			type: 'DECIMAL(10,2)',
+			notNull: true,
+			comment: 'Cantidad'
 		},
 		{
-			name: 'COSTO_TOTAL',
+			name: 'PRECIO',
 			type: 'DECIMAL(10,2)',
 			notNull: true
 		},
 		{
-			name: 'FK_USUARIO',
-			complement: '_CREATE',
-			notNull: true
-		},
-		{
-			name: 'CREATE_TIME',
-			type: 'TIMESTAMP',
+			name: 'IS_ACTIVE',
+			type: 'BOOLEAN',
 			notNull: true,
-			default: 'CURRENT_TIMESTAMP'
+			default: 1,
+			comment: 'Flag de Actividad'
 		},
 		{
-			name: 'FK_USUARIO',
-			complement: '_UPDATE',
-			notNull: false
+			name: 'FK_INGRESO'
 		},
 		{
-			name: 'UPDATE_TIME',
-			type: 'TIMESTAMP'
+			name: 'FK_ARTICULO'
 		},
 		{
-			name: 'FK_PROVEEDOR_CLIENTE'
-		},
-		{
-			name: 'FK_TIPO_DOCUMENTO'
+			name: 'FK_ALMACEN'
 		}
 	]
 };
